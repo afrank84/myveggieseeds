@@ -14,7 +14,8 @@ if ($conn->connect_error) {
 
 // Check if the user is logged in
 if (!isset($_SESSION['username'])) {
-    die("Unauthorized access. Please log in.");
+    header("Location: login.php"); // Redirect to login page
+    exit;
 }
 
 // Fetch user details
@@ -34,7 +35,8 @@ if ($result->num_rows > 0) {
 
 $allowed_roles = ['admin', 'contributor'];
 if (!in_array($user_role, $allowed_roles)) {
-    die("Unauthorized access.");
+    header("Location: previous_page.php"); // Redirect to previous page
+    exit;
 }
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -44,30 +46,27 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $image_type = preg_replace('/[^a-zA-Z0-9_]/', '', $_POST['image_type']);
 
     $target_dir = "uploads/plants/";
-    
+
     // Ensure the target directory exists
     if (!is_dir($target_dir)) {
         mkdir($target_dir, 0777, true);
     }
 
-    $file_name = $plant_id . "_" . $parent_name . "_" . $variety_name . "_" . $image_type . "_" . basename($_FILES["file"]["name"]);
+    // Generate a sanitized file name base
+    $file_extension = pathinfo($_FILES["file"]["name"], PATHINFO_EXTENSION);
+    $file_base_name = $plant_id . "_" . $parent_name . "_" . $variety_name . "_" . $image_type;
+    $file_name = $file_base_name . "." . $file_extension;
     $file_name = preg_replace('/[^a-zA-Z0-9_\.-]/', '', $file_name); // Sanitize file name
     $target_file = $target_dir . $file_name;
     $uploadOk = 1;
-    $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+    $imageFileType = strtolower($file_extension);
 
-    // Check if image file is a actual image or fake image
+    // Check if image file is an actual image or fake image
     $check = getimagesize($_FILES["file"]["tmp_name"]);
     if ($check !== false) {
         $uploadOk = 1;
     } else {
         echo "File is not an image.";
-        $uploadOk = 0;
-    }
-
-    // Check if file already exists
-    if (file_exists($target_file)) {
-        echo "Sorry, file already exists.";
         $uploadOk = 0;
     }
 
@@ -89,8 +88,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         echo "Sorry, your file was not uploaded.";
     // if everything is ok, try to upload file
     } else {
+        // Delete any existing files with the same base name but different extension
+        foreach ($allowed_types as $ext) {
+            $existing_file = $target_dir . $file_base_name . "." . $ext;
+            if (file_exists($existing_file)) {
+                unlink($existing_file);
+            }
+        }
+
         if (move_uploaded_file($_FILES["file"]["tmp_name"], $target_file)) {
-            echo "The file ". htmlspecialchars(basename($_FILES["file"]["name"])). " has been uploaded.";
+            echo "The file ". htmlspecialchars($file_name). " has been uploaded.";
 
             // Update the database with the new image URL
             $image_url = $target_file;
@@ -107,6 +114,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             echo "Sorry, there was an error uploading your file.";
         }
     }
+
+    // Redirect back to the previous page
+    header("Location: " . $_SERVER['HTTP_REFERER']);
+    exit;
 }
 
 // Close connection
