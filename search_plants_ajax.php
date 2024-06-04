@@ -1,4 +1,6 @@
 <?php
+// search_plants_ajax.php
+
 // Include the configuration file
 $config = include('db_config.php');
 
@@ -27,11 +29,11 @@ $total_records = $result->num_rows;
 $data = '';
 if ($total_records > 0) {
     while ($row = $result->fetch_assoc()) {
-        $data .= "<tr>
-                    <td>{$row['plant_id']}</td>
-                    <td>{$row['parent_name']}</td>
-                    <td>{$row['variety_name']}</td>
-                  </tr>";
+        $data .= '<tr>';
+        $data .= '<td>' . $row['plant_id'] . '</td>';
+        $data .= '<td>' . $row['parent_name'] . '</td>';
+        $data .= '<td><a href="vegetable.php?plant_id=' . $row['plant_id'] . '">' . $row['variety_name'] . '</a></td>';
+        $data .= '</tr>';
     }
 } else {
     $data = "<tr><td colspan='3'>No records found</td></tr>";

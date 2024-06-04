@@ -1,3 +1,33 @@
+<?php
+// plant_detail.php
+
+// Include the configuration file
+$config = include('db_config.php');
+
+// Create connection
+$conn = new mysqli($config['servername'], $config['username'], $config['password'], $config['database']);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Get the plant ID from the URL
+$plant_id = isset($_GET['plant_id']) ? intval($_GET['plant_id']) : 0;
+
+// Fetch plant details
+$query = "SELECT * FROM plants WHERE plant_id = $plant_id";
+$result = $conn->query($query);
+
+if ($result->num_rows > 0) {
+    $plant = $result->fetch_assoc();
+} else {
+    die("No details found for the specified plant.");
+}
+
+// Close connection
+$conn->close();
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,10 +39,9 @@
 </head>
 <body>
 <?php include('gui_navbar.php'); ?>
-
   <div class="container">
-    <h2 class="text-center">Parent</h2>
-    <h1 class="text-center">Variety</h1>
+    <h2 class="text-center"><?php echo htmlspecialchars($plant['parent_name']); ?></h2>
+    <h1 class="text-center"><?php echo htmlspecialchars($plant['variety_name']); ?></h1>
     <p class="text-center">Zone: 9b</p>
     <!-- Top Layer -->
     <div class="row justify-content-center mt-5">
