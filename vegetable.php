@@ -47,7 +47,7 @@ $conn->close();
     <div class="row justify-content-center mt-5">
         <div class="col-md-3">
           <div class="card">
-            <img src="https://placehold.co/150" class="card-img-top" alt="Image Placeholder">
+            <img src="<?php echo htmlspecialchars($plant['seed_image_url']); ?>" class="card-img-top" alt="Seed Image">
             <div class="card-body">
               <p class="card-text text-center">Seed</p>
             </div>
@@ -55,7 +55,7 @@ $conn->close();
         </div>
         <div class="col-md-3">
           <div class="card">
-            <img src="https://placehold.co/150" class="card-img-top" alt="Image Placeholder">
+            <img src="<?php echo htmlspecialchars($plant['plant_image_url']); ?>" class="card-img-top" alt="Plant Image">
             <div class="card-body">
               <p class="card-text text-center">Plant</p>
             </div>
@@ -63,7 +63,7 @@ $conn->close();
         </div>
         <div class="col-md-3">
           <div class="card">
-            <img src="https://placehold.co/150" class="card-img-top" alt="Image Placeholder">
+            <img src="<?php echo htmlspecialchars($plant['fruit_image_url']); ?>" class="card-img-top" alt="Fruit Image">
             <div class="card-body">
               <p class="card-text text-center">Fruit</p>
             </div>
@@ -71,7 +71,7 @@ $conn->close();
         </div>
         <div class="col-md-3">
           <div class="card">
-            <img src="https://placehold.co/150" class="card-img-top" alt="Image Placeholder">
+            <img src="<?php echo htmlspecialchars($plant['flower_image_url']); ?>" class="card-img-top" alt="Flower Image">
             <div class="card-body">
               <p class="card-text text-center">Flower</p>
             </div>
@@ -107,7 +107,7 @@ $conn->close();
         </div>
       </div>
 
-          <!-- Table -->
+    <!-- Table -->
     <div class="row justify-content-center mt-5">
         <div class="col-12" style="max-width: 72rem;">
           <table class="table">
@@ -120,23 +120,23 @@ $conn->close();
             <tbody>
               <tr>
                 <td>DTG (Days to Grow)</td>
-                <td>Enter_Value</td>
+                <td><?php echo htmlspecialchars($plant['dtg_days_to_grow']); ?></td>
               </tr>
               <tr>
                 <td>DTH (Days to Harvest)</td>
-                <td>Enter_Value</td>
+                <td><?php echo htmlspecialchars($plant['dth_days_to_harvest']); ?></td>
               </tr>
               <tr>
                 <td>Depth to Sow</td>
-                <td>Enter_Value</td>
+                <td><?php echo htmlspecialchars($plant['depth_to_sow']); ?></td>
               </tr>
               <tr>
                 <td>Seed Spacing</td>
-                <td>Enter_Value</td>
+                <td><?php echo htmlspecialchars($plant['seed_spacing']); ?></td>
               </tr>
               <tr>
                 <td>Row Spacing</td>
-                <td>Enter_Value</td>
+                <td><?php echo htmlspecialchars($plant['row_spacing']); ?></td>
               </tr>
             </tbody>
           </table>
@@ -203,6 +203,5 @@ $conn->close();
   <script src="js/searchbarAjax.js"></script>
   <script src="js/sortEventsTable.js"></script><!--Custom: Frank-->
 
-  
 </body>
 </html>
