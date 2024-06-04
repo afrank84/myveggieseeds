@@ -13,29 +13,25 @@ if ($conn->connect_error) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $inputUsername = $_POST['username'];
-    $inputPassword = $_POST['password'];
+    $username = $_POST['username'];
+    $password = $_POST['password'];
 
     // Fetch user from database
     $sql = "SELECT * FROM users WHERE username = ?";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("s", $inputUsername);
+    $stmt->bind_param("s", $username);
     $stmt->execute();
     $result = $stmt->get_result();
     $user = $result->fetch_assoc();
 
-    if ($user && password_verify($inputPassword, $user['password'])) {
+    if ($user && password_verify($password, $user['password'])) {
         $_SESSION['username'] = $user['username'];
-        echo "Login successful!";
-        // Redirect to a protected page or dashboard
+        $_SESSION['profile_image'] = $user['profile_image'] ?? 'default_profile.png'; // Set profile image in session
         header("Location: dashboard.php");
         exit();
     } else {
         echo "Invalid username or password!";
     }
-
-    $stmt->close();
 }
-
 $conn->close();
 ?>
