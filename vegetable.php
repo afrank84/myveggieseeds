@@ -33,9 +33,6 @@ if ($result->num_rows > 0) {
 }
 
 $allowed_roles = ['admin', 'contributor'];
-if (!in_array($user_role, $allowed_roles)) {
-    die("Unauthorized access.");
-}
 
 // Get the plant ID from the URL
 $plant_id = isset($_GET['plant_id']) ? intval($_GET['plant_id']) : 0;
