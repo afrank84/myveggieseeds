@@ -215,52 +215,35 @@ $conn->close();
     </div>
 
     <!-- Sortable Table Layer -->
-    <h4>Records</h4>
-    <div class="row justify-content-center mt-5">
-      <div class="col-12" style="max-width: 72rem;">
-        <table id="sortableTable" class="table table-hover">
-          <thead>
-            <tr>
-              <th scope="col" onclick="sortTable(0)">Date</th>
-              <th scope="col" onclick="sortTable(1)">Event</th>
-              <th scope="col" onclick="sortTable(2)">Description</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>YYYY-MM--DD</td>
-              <td>Filler text 2</td>
-              <td>Filler text 3</td>
-            </tr>
-            <tr>
-              <td>YYYY-MM--DD</td>
-              <td>Filler text 5</td>
-              <td>Filler text 6</td>
-            </tr>
-            <tr>
-              <td>YYYY-MM--DD</td>
-              <td>Filler text 8</td>
-              <td>Filler text 9</td>
-            </tr>
-            <tr>
-              <td>YYYY-MM--DD</td>
-              <td>Filler text 11</td>
-              <td>Filler text 12</td>
-            </tr>
-            <tr>
-              <td>YYYY-MM--DD</td>
-              <td>Filler text 14</td>
-              <td>Filler text 15</td>
-            </tr>
-            <tr>
-              <td>YYYY-MM--DD</td>
-              <td>Filler text 17</td>
-              <td>Filler text 18</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
+    <div class="row justify-content-center">
+            <div class="col-12" style="max-width: 72rem;">
+                <table id="sortableTable" class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th scope="col" onclick="sortTable(0)">Date</th>
+                            <th scope="col" onclick="sortTable(1)">Event</th>
+                            <th scope="col" onclick="sortTable(2)">Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        if (($handle = fopen("events/records.csv", "r")) !== FALSE) {
+                            // Skip the header row
+                            fgetcsv($handle, 1000, ",");
+                            while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
+                                echo "<tr>";
+                                echo "<td>{$data[0]}</td>";
+                                echo "<td>{$data[1]}</td>";
+                                echo "<td>{$data[2]}</td>";
+                                echo "</tr>";
+                            }
+                            fclose($handle);
+                        }
+                        ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
     <!-- Add this modal structure at the end of your body section -->
     <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
