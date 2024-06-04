@@ -1,5 +1,5 @@
 <?php
-// plant_detail.php
+session_start();
 
 // Include the configuration file
 $config = include('db_config.php');
@@ -12,12 +12,40 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
+// Check if the user is logged in
+if (!isset($_SESSION['username'])) {
+    die("Unauthorized access. Please log in.");
+}
+
+// Fetch user details
+$username = $_SESSION['username'];
+$query = "SELECT role FROM users WHERE username = ?";
+$stmt = $conn->prepare($query);
+$stmt->bind_param("s", $username);
+$stmt->execute();
+$result = $stmt->get_result();
+
+if ($result->num_rows > 0) {
+    $user = $result->fetch_assoc();
+    $user_role = $user['role'];
+} else {
+    die("User not found.");
+}
+
+$allowed_roles = ['admin', 'contributor'];
+if (!in_array($user_role, $allowed_roles)) {
+    die("Unauthorized access.");
+}
+
 // Get the plant ID from the URL
 $plant_id = isset($_GET['plant_id']) ? intval($_GET['plant_id']) : 0;
 
 // Fetch plant details
-$query = "SELECT * FROM plants WHERE plant_id = $plant_id";
-$result = $conn->query($query);
+$query = "SELECT * FROM plants WHERE plant_id = ?";
+$stmt = $conn->prepare($query);
+$stmt->bind_param("i", $plant_id);
+$stmt->execute();
+$result = $stmt->get_result();
 
 if ($result->num_rows > 0) {
     $plant = $result->fetch_assoc();
@@ -25,9 +53,11 @@ if ($result->num_rows > 0) {
     die("No details found for the specified plant.");
 }
 
-// Close connection
+// Close statement and connection
+$stmt->close();
 $conn->close();
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -43,6 +73,7 @@ $conn->close();
     <h2 class="text-center"><?php echo htmlspecialchars($plant['parent_name']); ?></h2>
     <h1 class="text-center"><?php echo htmlspecialchars($plant['variety_name']); ?></h1>
     <p class="text-center">Zone: 9b</p>
+    
     <!-- Top Layer -->
     <div class="row justify-content-center mt-5">
         <div class="col-md-3">
@@ -50,6 +81,16 @@ $conn->close();
             <img src="<?php echo htmlspecialchars($plant['seed_image_url']); ?>" class="card-img-top" alt="Seed Image">
             <div class="card-body">
               <p class="card-text text-center">Seed</p>
+              <?php if (in_array($user_role, $allowed_roles)) { ?>
+              <form action="upload_image.php" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="plant_id" value="<?php echo $plant['plant_id']; ?>">
+                <input type="hidden" name="parent_name" value="<?php echo htmlspecialchars($plant['parent_name']); ?>">
+                <input type="hidden" name="variety_name" value="<?php echo htmlspecialchars($plant['variety_name']); ?>">
+                <input type="hidden" name="image_type" value="seed">
+                <input type="file" name="file" required>
+                <button type="submit" class="btn btn-primary btn-sm mt-2">Upload</button>
+              </form>
+              <?php } ?>
             </div>
           </div>
         </div>
@@ -58,6 +99,16 @@ $conn->close();
             <img src="<?php echo htmlspecialchars($plant['plant_image_url']); ?>" class="card-img-top" alt="Plant Image">
             <div class="card-body">
               <p class="card-text text-center">Plant</p>
+              <?php if (in_array($user_role, $allowed_roles)) { ?>
+              <form action="upload_image.php" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="plant_id" value="<?php echo $plant['plant_id']; ?>">
+                <input type="hidden" name="parent_name" value="<?php echo htmlspecialchars($plant['parent_name']); ?>">
+                <input type="hidden" name="variety_name" value="<?php echo htmlspecialchars($plant['variety_name']); ?>">
+                <input type="hidden" name="image_type" value="plant">
+                <input type="file" name="file" required>
+                <button type="submit" class="btn btn-primary btn-sm mt-2">Upload</button>
+              </form>
+              <?php } ?>
             </div>
           </div>
         </div>
@@ -66,6 +117,16 @@ $conn->close();
             <img src="<?php echo htmlspecialchars($plant['fruit_image_url']); ?>" class="card-img-top" alt="Fruit Image">
             <div class="card-body">
               <p class="card-text text-center">Fruit</p>
+              <?php if (in_array($user_role, $allowed_roles)) { ?>
+              <form action="upload_image.php" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="plant_id" value="<?php echo $plant['plant_id']; ?>">
+                <input type="hidden" name="parent_name" value="<?php echo htmlspecialchars($plant['parent_name']); ?>">
+                <input type="hidden" name="variety_name" value="<?php echo htmlspecialchars($plant['variety_name']); ?>">
+                <input type="hidden" name="image_type" value="fruit">
+                <input type="file" name="file" required>
+                <button type="submit" class="btn btn-primary btn-sm mt-2">Upload</button>
+              </form>
+              <?php } ?>
             </div>
           </div>
         </div>
@@ -74,15 +135,24 @@ $conn->close();
             <img src="<?php echo htmlspecialchars($plant['flower_image_url']); ?>" class="card-img-top" alt="Flower Image">
             <div class="card-body">
               <p class="card-text text-center">Flower</p>
+              <?php if (in_array($user_role, $allowed_roles)) { ?>
+              <form action="upload_image.php" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="plant_id" value="<?php echo $plant['plant_id']; ?>">
+                <input type="hidden" name="parent_name" value="<?php echo htmlspecialchars($plant['parent_name']); ?>">
+                <input type="hidden" name="variety_name" value="<?php echo htmlspecialchars($plant['variety_name']); ?>">
+                <input type="hidden" name="image_type" value="flower">
+                <input type="file" name="file" required>
+                <button type="submit" class="btn btn-primary btn-sm mt-2">Upload</button>
+              </form>
+              <?php } ?>
             </div>
           </div>
         </div>
       </div>
     <hr/>
-
-
+    
     <h4>Information</h4>
-
+    
     <!-- 12-Column Table Layer -->
     <div class="row justify-content-center mt-5">
         <div class="col-12" style="max-width: 72rem;">
@@ -106,7 +176,7 @@ $conn->close();
           </table>
         </div>
       </div>
-
+    
     <!-- Table -->
     <div class="row justify-content-center mt-5">
         <div class="col-12" style="max-width: 72rem;">
@@ -190,18 +260,18 @@ $conn->close();
           </table>
         </div>
       </div>
-
+    
       <hr/>
       <p class="text-center">Copyright @ 2024</p>
-
+    
   </div>
-
+    
   <!-- Bootstrap JS and dependencies -->
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
   <script src="js/searchbarAjax.js"></script>
   <script src="js/sortEventsTable.js"></script><!--Custom: Frank-->
-
+  
 </body>
 </html>
