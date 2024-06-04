@@ -11,7 +11,7 @@
             <a class="nav-link active" aria-current="page" href="index.html">Home</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#">Dashboard</a>
+            <a class="nav-link" href="dashboard.php">Dashboard</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="search_plants_form.php">Plant-a-base</a>
@@ -31,7 +31,7 @@
         </ul>
         <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
           <li class="nav-item">
-            <a class="nav-link" aria-current="page" href="#">Login</a>
+            <a class="nav-link" aria-current="page" href="login.php">Login</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" aria-current="page" href="#">Signup</a>
