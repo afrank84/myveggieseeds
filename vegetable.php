@@ -217,33 +217,37 @@ $conn->close();
     <!-- Sortable Table Layer -->
     <div class="row justify-content-center">
             <div class="col-12" style="max-width: 72rem;">
-                <table id="sortableTable" class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th scope="col" onclick="sortTable(0)">Date</th>
-                            <th scope="col" onclick="sortTable(1)">Event</th>
-                            <th scope="col" onclick="sortTable(2)">Description</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php
-                        if (($handle = fopen("events/records.csv", "r")) !== FALSE) {
-                            // Skip the header row
-                            fgetcsv($handle, 1000, ",");
-                            while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
-                                echo "<tr>";
-                                echo "<td>{$data[0]}</td>";
-                                echo "<td>{$data[1]}</td>";
-                                echo "<td>{$data[2]}</td>";
-                                echo "</tr>";
+                <form id="editableTableForm" method="post" action="save_csv.php">
+                    <table id="sortableTable" class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th scope="col" onclick="sortTable(0)">Date</th>
+                                <th scope="col" onclick="sortTable(1)">Event</th>
+                                <th scope="col" onclick="sortTable(2)">Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php
+                            if (($handle = fopen("events/records.csv", "r")) !== FALSE) {
+                                // Skip the header row
+                                fgetcsv($handle, 1000, ",");
+                                while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
+                                    echo "<tr>";
+                                    echo "<td contenteditable='true'>{$data[0]}</td>";
+                                    echo "<td contenteditable='true'>{$data[1]}</td>";
+                                    echo "<td contenteditable='true'>{$data[2]}</td>";
+                                    echo "</tr>";
+                                }
+                                fclose($handle);
                             }
-                            fclose($handle);
-                        }
-                        ?>
-                    </tbody>
-                </table>
+                            ?>
+                        </tbody>
+                    </table>
+                    <button type="button" class="btn btn-primary" onclick="saveTable()">Save</button>
+                </form>
             </div>
         </div>
+    </div>   
 
     <!-- Add this modal structure at the end of your body section -->
     <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
@@ -267,6 +271,7 @@ $conn->close();
   </div>
 
   <!-- Bootstrap JS and dependencies -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
@@ -283,6 +288,29 @@ $conn->close();
       });
     });
   </script>
+  <script>
+        function saveTable() {
+            var form = document.getElementById('editableTableForm');
+            var rows = document.querySelectorAll('#sortableTable tbody tr');
+            var data = [];
+            
+            rows.forEach(function(row) {
+                var cells = row.querySelectorAll('td');
+                var rowData = [];
+                cells.forEach(function(cell) {
+                    rowData.push(cell.innerText);
+                });
+                data.push(rowData);
+            });
+
+            var input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'tableData';
+            input.value = JSON.stringify(data);
+            form.appendChild(input);
+            form.submit();
+        }
+    </script>
 
 </body>
 
